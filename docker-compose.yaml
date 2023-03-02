@@ -6,6 +6,7 @@ services:
     image: postgres
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
+#      //Problem with connecting to the database with the password "secret password" I can only connect to the database through the universal one
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-secretpassword}
       PGDATA: /data/postgres
     volumes:
