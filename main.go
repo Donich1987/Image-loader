@@ -31,7 +31,7 @@ func main() {
 	db, err := sqlx.Connect(cfg.DB.Driver, fmt.Sprintf("user=%s dbname=%s sslmode=%s password=%s", cfg.DB.User,
 		cfg.DB.Name, cfg.DB.SSLMode, cfg.DB.Password))
 	if err != nil {
-		logger.Fatal(err)
+		logger.Fatal(err.Error())
 	}
 
 	minioClient, err := minio.New(cfg.Minio.Endpoint, &minio.Options{
