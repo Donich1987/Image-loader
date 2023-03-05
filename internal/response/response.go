@@ -1,6 +1,8 @@
 package response
 
-import "encoding/json"
+import (
+	"encoding/json"
+)
 
 type Response struct {
 	Data  any  `json:"data"`

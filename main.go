@@ -2,9 +2,11 @@ package main
 
 import (
 	"Image-loader/internal/config"
+	"Image-loader/internal/filestore"
 	"Image-loader/internal/repository"
 	"Image-loader/internal/server"
 	"Image-loader/internal/service"
+	"Image-loader/internal/telegram"
 	"context"
 	"fmt"
 	"github.com/jmoiron/sqlx"
@@ -13,6 +15,16 @@ import (
 	"github.com/minio/minio-go/v7/pkg/credentials"
 	"github.com/sirupsen/logrus"
 )
+
+// @title           Example Project API
+// @version         1.0
+// @description     Это API учебного проекта
+
+// @license.name  Apache 2.0
+// @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
+
+// @host      localhost:8000
+// @BasePath  /
 
 func main() {
 	ctx := context.Background()
@@ -31,7 +43,7 @@ func main() {
 	db, err := sqlx.Connect(cfg.DB.Driver, fmt.Sprintf("user=%s dbname=%s sslmode=%s password=%s", cfg.DB.User,
 		cfg.DB.Name, cfg.DB.SSLMode, cfg.DB.Password))
 	if err != nil {
-		logger.Fatal(err.Error())
+		logger.Fatal(err)
 	}
 
 	minioClient, err := minio.New(cfg.Minio.Endpoint, &minio.Options{
@@ -54,17 +66,28 @@ func main() {
 		}
 	}
 
+	fileStore := filestore.NewMinio(minioClient, cfg.Minio.Bucket)
+
 	userRepo := repository.NewUserRepo(db, cfg.DB)
+
+	imageRepo := repository.NewImageRepo(db, cfg.DB)
 
 	err = userRepo.RunMigrations()
 	if err != nil {
 		logger.Warning(err)
 	}
 
-	controller := service.NewController(userRepo, cfg, minioClient)
+	controller := service.NewController(userRepo, imageRepo, cfg, fileStore)
 
 	srv := server.NewServer(":8000", logger, controller, cfg)
 	srv.RegisterRoutes()
+
+	bot, err := telegram.NewBot(cfg.TgBot.APIKey, logger, controller)
+	if err != nil {
+		logger.Fatal(err)
+	}
+
+	go bot.StartBot()
 
 	srv.StartServer()
 }
