@@ -1,11 +1,11 @@
 package repository
 
 import (
-	"Image-loader/internal/config"
-	"Image-loader/internal/model"
 	"context"
 	"database/sql"
 	"fmt"
+	"github.com/Donich1987/Image-loader/internal/config"
+	"github.com/Donich1987/Image-loader/internal/model"
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"

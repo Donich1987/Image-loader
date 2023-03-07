@@ -1,10 +1,10 @@
 package repository
 
 import (
-	"Image-loader/internal/config"
-	"Image-loader/internal/model"
 	"context"
 	"fmt"
+	"github.com/Donich1987/Image-loader/internal/config"
+	"github.com/Donich1987/Image-loader/internal/model"
 	"github.com/jmoiron/sqlx"
 )
 

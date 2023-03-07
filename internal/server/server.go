@@ -1,16 +1,17 @@
 package server
 
 import (
-	"Image-loader/internal/config"
-	"Image-loader/internal/constants"
-	"Image-loader/internal/middleware"
-	"Image-loader/internal/model"
-	"Image-loader/internal/response"
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/Donich1987/Image-loader/internal/config"
+	"github.com/Donich1987/Image-loader/internal/constants"
+	"github.com/Donich1987/Image-loader/internal/middleware"
+	"github.com/Donich1987/Image-loader/internal/model"
+	"github.com/Donich1987/Image-loader/internal/response"
 	"github.com/go-chi/chi"
 	"github.com/sirupsen/logrus"
+	httpSwagger "github.com/swaggo/http-swagger"
 	"io"
 	"net/http"
 	"strconv"
@@ -53,7 +54,6 @@ func NewServer(listenURI string, logger *logrus.Logger, c controller, cfg *confi
 }
 
 func (s *Server) RegisterRoutes() {
-
 	s.r.Use(middleware.Logger(s.logger))
 	s.r.Get("/user/auth", s.HandleAuthorize)
 	s.r.Post("/user/add", s.HandleAddUser)
@@ -66,6 +66,17 @@ func (s *Server) RegisterRoutes() {
 		r.Delete("/user/{userID}", s.HandleDeleteUser)
 		r.Post("/image/add", s.HandleAddFile)
 	})
+	go s.StartSwagger()
+}
+
+func (s *Server) StartSwagger() {
+	s.r.Get("/swagger/*", httpSwagger.Handler(
+		httpSwagger.URL("http://localhost:8000/swagger/doc.json"), //The url pointing to API definition
+	))
+	err := http.ListenAndServe(":8001", s.r)
+	if err != nil {
+		s.logger.Fatal(err)
+	}
 }
 
 func (s *Server) StartServer() {
@@ -73,7 +84,6 @@ func (s *Server) StartServer() {
 		Addr:    s.listenURI,
 		Handler: s.r,
 	}
-
 	s.logger.Info("server is running!")
 	err := srv.ListenAndServe()
 	if err != nil {
@@ -168,6 +178,19 @@ func (s *Server) HandleAddUser(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
+// HandleGetUser get user by id
+//
+//	@Summary        GetUserById
+//	@Description    get user
+//	@Tags            user
+//	@Accept            json
+//	@Produce        json
+//	@Param            id    path        string    true    "get user by ID"
+//	@Success        200    {array}        model.User
+//	@Failure        400    {object}    response.Response
+//	@Failure        404    {object}    response.Response
+//	@Failure        500    {object}    response.Response
+//	@Router            /user/{userID} [get]
 func (s *Server) HandleGetUser(w http.ResponseWriter, r *http.Request) {
 	idStr := chi.URLParam(r, "userID")
 
@@ -196,6 +219,19 @@ func (s *Server) HandleGetUser(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// HandleDeleteUser delete a user
+//
+//	@Summary        DeleteUser
+//	@Description    delete a user
+//	@Tags            user
+//	@Accept            json
+//	@Produce        json
+//	@Param            id    path        string    true    "delete user"
+//	@Success        200    {array}        model.User
+//	@Failure        400    {object}    response.Response
+//	@Failure        404    {object}    response.Response
+//	@Failure        500    {object}    response.Response
+//	@Router            /user/{userID} [delete]
 func (s *Server) HandleDeleteUser(w http.ResponseWriter, r *http.Request) {
 	idStr := chi.URLParam(r, "userID")
 
@@ -214,6 +250,19 @@ func (s *Server) HandleDeleteUser(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
+// HandleUpdateUser update user
+//
+//	@Summary        UpdateUser
+//	@Description    update user
+//	@Tags            user
+//	@Accept            json
+//	@Produce        json
+//	@Param            user    body        User    true    "update user"
+//	@Success        200        {array}        model.User
+//	@Failure        400        {object}    response.Response
+//	@Failure        404        {object}    response.Response
+//	@Failure        500        {object}    response.Response
+//	@Router            /user/update [put]
 func (s *Server) HandleUpdateUser(w http.ResponseWriter, r *http.Request) {
 	var user User
 
@@ -239,6 +288,19 @@ func (s *Server) HandleUpdateUser(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
+// HandleAddFile add image to minio
+//
+//	@Summary        AddFile
+//	@Description    add image to minio
+//	@Tags            image
+//	@Accept            json
+//	@Produce        json
+//	@Param            fileKey     formData        file    true    "upload images"
+//	@Success        200        {array}        response.Response
+//	@Failure        400        {object}    response.Response
+//	@Failure        404        {object}    response.Response
+//	@Failure        500        {object}    response.Response
+//	@Router            /image/add [post]
 func (s *Server) HandleAddFile(w http.ResponseWriter, r *http.Request) {
 	file, header, err := r.FormFile("fileKey")
 	if err != nil {

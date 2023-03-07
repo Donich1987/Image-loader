@@ -1,11 +1,11 @@
 package service
 
 import (
-	"Image-loader/internal/config"
-	"Image-loader/internal/constants"
-	"Image-loader/internal/model"
 	"context"
 	"fmt"
+	"github.com/Donich1987/Image-loader/internal/config"
+	"github.com/Donich1987/Image-loader/internal/constants"
+	"github.com/Donich1987/Image-loader/internal/model"
 	"github.com/gofrs/uuid"
 	"github.com/golang-jwt/jwt/v5"
 	"io"

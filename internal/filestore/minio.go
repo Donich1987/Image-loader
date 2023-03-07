@@ -1,8 +1,8 @@
 package filestore
 
 import (
-	"Image-loader/internal/model"
 	"context"
+	"github.com/Donich1987/Image-loader/internal/model"
 	"github.com/minio/minio-go/v7"
 	"io"
 	"time"

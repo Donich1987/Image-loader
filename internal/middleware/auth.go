@@ -1,9 +1,9 @@
 package middleware
 
 import (
-	"Image-loader/internal/constants"
-	"Image-loader/internal/response"
 	"context"
+	"github.com/Donich1987/Image-loader/internal/constants"
+	"github.com/Donich1987/Image-loader/internal/response"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/sirupsen/logrus"
 	"net/http"
