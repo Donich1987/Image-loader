@@ -1,9 +1,9 @@
 package middleware
 
 import (
-	"Image-loader/internal/constants"
-	"Image-loader/internal/response"
 	"context"
+	"github.com/Donich1987/Image-loader/internal/constants"
+	"github.com/Donich1987/Image-loader/internal/response"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/sirupsen/logrus"
 	"net/http"
@@ -33,6 +33,7 @@ func Auth(keyword string, l *logrus.Logger) func(next http.Handler) http.Handler
 					l.Error(err)
 					return
 				}
+				return
 			}
 
 			idStr, err := token.Claims.GetIssuer()
@@ -48,7 +49,7 @@ func Auth(keyword string, l *logrus.Logger) func(next http.Handler) http.Handler
 			}
 
 			ctx := r.Context()
-			ctx = context.WithValue(ctx, constants.IdCtxKey, id)
+			ctx = context.WithValue(ctx, constants.IdCtxKey, int(id))
 
 			next.ServeHTTP(w, r.WithContext(ctx))
 		}
