@@ -17,6 +17,7 @@ import (
 	"strconv"
 )
 
+//go:generate mockgen -source ./server.go -destination ../mock/server.go -package mock
 type User struct {
 	ID          int      `json:"id"`
 	Name        string   `json:"name"`
@@ -55,7 +56,7 @@ func NewServer(listenURI string, logger *logrus.Logger, c controller, cfg *confi
 
 func (s *Server) RegisterRoutes() {
 	s.r.Use(middleware.Logger(s.logger))
-	s.r.Get("/user/auth", s.HandleAuthorize)
+	s.r.Post("/user/auth", s.HandleAuthorize)
 	s.r.Post("/user/add", s.HandleAddUser)
 
 	s.r.Group(func(r chi.Router) {
@@ -98,12 +99,12 @@ func (s *Server) StartServer() {
 //	@Tags         auth
 //	@Accept       json
 //	@Produce      json
-//	@Param        user    body     User  true  "authorize user"
+//	@Param        user    body     User  false "authorize user"
 //	@Success      200  {array}   response.Response
 //	@Failure      400  {object}  response.Response
 //	@Failure      404  {object}  response.Response
 //	@Failure      500  {object}  response.Response
-//	@Router       /user/auth [get]
+//	@Router       /user/auth [post]
 func (s *Server) HandleAuthorize(w http.ResponseWriter, r *http.Request) {
 	var user User
 
@@ -144,10 +145,10 @@ func (s *Server) HandleAuthorize(w http.ResponseWriter, r *http.Request) {
 //
 //	@Summary      AddUser
 //	@Description  add a new user
-//	@Tags         user
+//	@Tags         auth
 //	@Accept       json
 //	@Produce      json
-//	@Param        user    body     User  true  "authorize user"
+//	@Param        user    body     User  false  "authorize user"
 //	@Success      200  {array}   response.Response
 //	@Failure      400  {object}  response.Response
 //	@Failure      404  {object}  response.Response
@@ -180,17 +181,18 @@ func (s *Server) HandleAddUser(w http.ResponseWriter, r *http.Request) {
 
 // HandleGetUser get user by id
 //
-//	@Summary        GetUserById
-//	@Description    get user
-//	@Tags            user
-//	@Accept            json
-//	@Produce        json
-//	@Param            id    path        string    true    "get user by ID"
-//	@Success        200    {array}        model.User
-//	@Failure        400    {object}    response.Response
-//	@Failure        404    {object}    response.Response
-//	@Failure        500    {object}    response.Response
-//	@Router            /user/{userID} [get]
+//	 @Security ApiKeyAuth
+//		@Summary        GetUserById
+//		@Description    get user
+//		@Tags            user
+//		@Accept            json
+//		@Produce        json
+//		@Param            id    path        string    true    "get user by ID"
+//		@Success        200    {array}        model.User
+//		@Failure        400    {object}    response.Response
+//		@Failure        404    {object}    response.Response
+//		@Failure        500    {object}    response.Response
+//		@Router            /user/{userID} [get]
 func (s *Server) HandleGetUser(w http.ResponseWriter, r *http.Request) {
 	idStr := chi.URLParam(r, "userID")
 
@@ -221,17 +223,18 @@ func (s *Server) HandleGetUser(w http.ResponseWriter, r *http.Request) {
 
 // HandleDeleteUser delete a user
 //
-//	@Summary        DeleteUser
-//	@Description    delete a user
-//	@Tags            user
-//	@Accept            json
-//	@Produce        json
-//	@Param            id    path        string    true    "delete user"
-//	@Success        200    {array}        model.User
-//	@Failure        400    {object}    response.Response
-//	@Failure        404    {object}    response.Response
-//	@Failure        500    {object}    response.Response
-//	@Router            /user/{userID} [delete]
+//	 @Security ApiKeyAuth
+//		@Summary        DeleteUser
+//		@Description    delete a user
+//		@Tags            user
+//		@Accept            json
+//		@Produce        json
+//		@Param            id    path        string    true    "delete user"
+//		@Success        200    {array}        model.User
+//		@Failure        400    {object}    response.Response
+//		@Failure        404    {object}    response.Response
+//		@Failure        500    {object}    response.Response
+//		@Router            /user/{userID} [delete]
 func (s *Server) HandleDeleteUser(w http.ResponseWriter, r *http.Request) {
 	idStr := chi.URLParam(r, "userID")
 
@@ -252,17 +255,18 @@ func (s *Server) HandleDeleteUser(w http.ResponseWriter, r *http.Request) {
 
 // HandleUpdateUser update user
 //
-//	@Summary        UpdateUser
-//	@Description    update user
-//	@Tags            user
-//	@Accept            json
-//	@Produce        json
-//	@Param            user    body        User    true    "update user"
-//	@Success        200        {array}        model.User
-//	@Failure        400        {object}    response.Response
-//	@Failure        404        {object}    response.Response
-//	@Failure        500        {object}    response.Response
-//	@Router            /user/update [put]
+//	 @Security ApiKeyAuth
+//		@Summary        UpdateUser
+//		@Description    update user
+//		@Tags            user
+//		@Accept            json
+//		@Produce        json
+//		@Param            user    body        User    true    "update user"
+//		@Success        200        {array}        model.User
+//		@Failure        400        {object}    response.Response
+//		@Failure        404        {object}    response.Response
+//		@Failure        500        {object}    response.Response
+//		@Router            /user/update [put]
 func (s *Server) HandleUpdateUser(w http.ResponseWriter, r *http.Request) {
 	var user User
 
@@ -290,17 +294,18 @@ func (s *Server) HandleUpdateUser(w http.ResponseWriter, r *http.Request) {
 
 // HandleAddFile add image to minio
 //
-//	@Summary        AddFile
-//	@Description    add image to minio
-//	@Tags            image
-//	@Accept            json
-//	@Produce        json
-//	@Param            fileKey     formData        file    true    "upload images"
-//	@Success        200        {array}        response.Response
-//	@Failure        400        {object}    response.Response
-//	@Failure        404        {object}    response.Response
-//	@Failure        500        {object}    response.Response
-//	@Router            /image/add [post]
+//	 @Security ApiKeyAuth
+//		@Summary        AddFile
+//		@Description    add image to minio
+//		@Tags            image
+//		@Accept            json
+//		@Produce        json
+//		@Param            fileKey     formData        file    true    "upload images"
+//		@Success        200        {array}        response.Response
+//		@Failure        400        {object}    response.Response
+//		@Failure        404        {object}    response.Response
+//		@Failure        500        {object}    response.Response
+//		@Router            /image/add [post]
 func (s *Server) HandleAddFile(w http.ResponseWriter, r *http.Request) {
 	file, header, err := r.FormFile("fileKey")
 	if err != nil {

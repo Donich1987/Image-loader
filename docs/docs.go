@@ -21,6 +21,11 @@ const docTemplate = `{
     "paths": {
         "/image/add": {
             "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "add image to minio",
                 "consumes": [
                     "application/json"
@@ -82,7 +87,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "user"
+                    "auth"
                 ],
                 "summary": "AddUser",
                 "parameters": [
@@ -90,7 +95,6 @@ const docTemplate = `{
                         "description": "authorize user",
                         "name": "user",
                         "in": "body",
-                        "required": true,
                         "schema": {
                             "$ref": "#/definitions/server.User"
                         }
@@ -128,7 +132,7 @@ const docTemplate = `{
             }
         },
         "/user/auth": {
-            "get": {
+            "post": {
                 "description": "Issue JWT",
                 "consumes": [
                     "application/json"
@@ -145,7 +149,6 @@ const docTemplate = `{
                         "description": "authorize user",
                         "name": "user",
                         "in": "body",
-                        "required": true,
                         "schema": {
                             "$ref": "#/definitions/server.User"
                         }
@@ -184,6 +187,11 @@ const docTemplate = `{
         },
         "/user/update": {
             "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "update user",
                 "consumes": [
                     "application/json"
@@ -239,6 +247,11 @@ const docTemplate = `{
         },
         "/user/{userID}": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "get user",
                 "consumes": [
                     "application/json"
@@ -290,6 +303,11 @@ const docTemplate = `{
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "delete a user",
                 "consumes": [
                     "application/json"
@@ -403,6 +421,13 @@ const docTemplate = `{
                     "type": "string"
                 }
             }
+        }
+    },
+    "securityDefinitions": {
+        "ApiKeyAuth": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
         }
     }
 }`
