@@ -27,6 +27,10 @@ import (
 // @host      localhost:8000
 // @BasePath  /
 
+// @securityDefinitions.apikey ApiKeyAuth
+// @in header
+// @name Authorization
+
 func main() {
 	ctx := context.Background()
 
